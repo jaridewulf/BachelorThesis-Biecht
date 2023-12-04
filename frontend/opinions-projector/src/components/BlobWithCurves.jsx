@@ -8,8 +8,8 @@ const BlobWithCurves = () => {
   const height = 400;
   const center = { x: width / 2, y: height / 2 };
   const maxRadius = Math.max(width, height) / 2 - 10;
-  // Will shouw severity
-  const tension = 1;
+  // Will show severity
+  const tension = 0.2;
   const fill = "rgba(0, 120, 255, 1)";
 
   // Function to scale data values to a radius range
