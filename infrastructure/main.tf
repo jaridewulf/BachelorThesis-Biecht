@@ -19,18 +19,6 @@ resource "aws_vpc" "this" {
   instance_tenancy = "default"
 }
 
-resource "aws_db_instance" "default" {
-  allocated_storage    = 10
-  db_name              = "mydb"
-  engine               = "mysql"
-  engine_version       = "5.7"
-  instance_class       = "db.t3.micro"
-  username             = var.mysql_username
-  password             = var.mysql_passwword
-  parameter_group_name = "default.mysql5.7"
-  skip_final_snapshot  = true
-}
-
 # Bucket that will hold the audio files
 resource "aws_s3_bucket" "audioBucket" {
   bucket = "debiecht-audio-files"

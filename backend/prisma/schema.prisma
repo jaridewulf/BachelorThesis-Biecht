@@ -1,0 +1,49 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Feedback {
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  bookmark Boolean
+  intensity Int
+  sentiment Sentiment
+  department Department @relation(fields: [departmentId], references: [id])
+  departmentId Int
+  audioUrl String
+  status Status
+  location Location @relation(fields: [locationId], references: [id])
+  locationId Int
+}
+
+model Location {
+  id Int @id @default(autoincrement())
+  name String
+  feedback Feedback[]
+}
+
+model Department {
+  id Int @id @default(autoincrement())
+  name String
+  feedback Feedback[]
+}
+
+enum Sentiment {
+  POSITIVE
+  NEGATIVE
+}
+
+enum Status {
+  OPEN
+  CLOSED
+  IN_PROGRESS
+}
