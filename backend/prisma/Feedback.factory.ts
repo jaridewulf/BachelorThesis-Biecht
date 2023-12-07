@@ -8,7 +8,7 @@ const feedbackData: Prisma.FeedbackCreateInput[] = [
   {
     audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
     bookmark: false,
-    intensity: 0,
+    intensity: 8,
     status: Status.OPEN,
     sentiment: Sentiment.NEGATIVE,
     department: { connect: { id: departmentIds[0] } },
@@ -17,7 +17,7 @@ const feedbackData: Prisma.FeedbackCreateInput[] = [
   {
     audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
     bookmark: false,
-    intensity: 1,
+    intensity: 7,
     status: Status.OPEN,
     sentiment: Sentiment.POSITIVE,
     department: { connect: { id: departmentIds[1] } },
@@ -26,7 +26,7 @@ const feedbackData: Prisma.FeedbackCreateInput[] = [
 {
     audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
     bookmark: true,
-    intensity: 2,
+    intensity: 8,
     status: Status.CLOSED,
     sentiment: Sentiment.NEGATIVE,
     department: { connect: { id: departmentIds[2] } },
