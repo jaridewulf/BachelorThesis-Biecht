@@ -1,9 +1,13 @@
 import { Prisma, PrismaClient, Status, Sentiment } from '@prisma/client'
 import express from 'express'
 require('dotenv').config()
+const cors = require('cors')
 
 const app = express()
 const prisma = new PrismaClient()
+
+// Enable CORS for all routes
+app.use(cors())
 
 app.get('/', async (req, res) => {
   // stuur api de biecht

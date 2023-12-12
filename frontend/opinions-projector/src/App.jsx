@@ -1,13 +1,28 @@
 import "./App.css";
-import Blob from "./components/Blob";
+import { useState, useEffect } from "react";
 import BlobWithCurves from "./components/BlobWithCurves";
 
 function App() {
+  const [feedbackData, setFeedbackData] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch('http://localhost:3000/feedback');
+        const data = await response.json();
+        setFeedbackData(data);
+      } catch (error) {
+        console.error('Error fetching feedback data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   return (
     <>
       <div>
-        <Blob />
-        <BlobWithCurves />
+        <BlobWithCurves feedbackData={feedbackData} />
       </div>
     </>
   );
