@@ -1,5 +1,5 @@
 import { PrismaClient, Prisma, Status, Sentiment } from '@prisma/client'
-import {createFeedback  } from './Feedback.factory';
+import { createFeedback } from './Feedback.factory';
 
 const prisma = new PrismaClient()
 
@@ -26,7 +26,7 @@ const departmentData: Prisma.DepartmentCreateInput[] = [
   },
   {
     name: 'Financiën'
-  },{
+  }, {
     name: 'Digitale Transformatie'
   }
 ]
