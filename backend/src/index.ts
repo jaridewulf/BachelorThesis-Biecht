@@ -5,6 +5,7 @@ const cors = require('cors')
 
 const app = express()
 const prisma = new PrismaClient()
+app.use(express.json());
 
 // Enable CORS for all routes
 app.use(cors())
@@ -54,7 +55,7 @@ app.post(`/feedback`, async (req, res) => {
 
 app.patch(`/feedback/:id/status`, async (req, res) => {
   const { id } = req.params
-  const { status  } = req.body
+  const { status } = req.body
 
   const feedback = await prisma.feedback.update({
     where: { id: Number(id) },
@@ -69,7 +70,7 @@ app.patch(`/feedback/:id/bookmark`, async (req, res) => {
 
   const feedback = await prisma.feedback.update({
     where: { id: Number(id) },
-    data: { bookmark: bookmarkStatus  },
+    data: { bookmark: bookmarkStatus },
   })
 
   res.json(feedback)
