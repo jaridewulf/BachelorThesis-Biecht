@@ -2,7 +2,7 @@ import gpiozero
 import math, os, time
 
 pin_rotary_enable = 23	# red cable
-pin_count_rotary = 18	# orange cable
+pin_count_rotary = 24	# orange cable
 pulses_per_number = 20
 
 rotaryenable = gpiozero.Button(pin_rotary_enable)
