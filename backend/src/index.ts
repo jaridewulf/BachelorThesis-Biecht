@@ -5,6 +5,7 @@ const cors = require('cors')
 
 const app = express()
 const prisma = new PrismaClient()
+app.use(express.json());
 
 // Enable CORS for all routes
 app.use(cors())
