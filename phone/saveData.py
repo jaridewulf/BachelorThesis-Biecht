@@ -48,8 +48,7 @@ def send_soundfile_and_write_data(data, soundfile_path_closed, soundfile_path_op
         time.sleep(1)  # Wait for 1 second before checking again
 
     # Add sound file URLs to data
-    data["audioUrl"] = soundfile_url_closed
-    # data["audioUrlOpen"] = soundfile_url_open
+    data["audioUrls"] = {"open": soundfile_url_open, "closed": soundfile_url_closed}
 
     # Write data to the specified URL
     response = requests.post(url, json=data)
