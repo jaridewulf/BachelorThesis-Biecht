@@ -11,29 +11,29 @@ datasource db {
 }
 
 model Feedback {
-  id Int @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  bookmark Boolean
-  intensity Int
-  sentiment Sentiment
-  department Department @relation(fields: [departmentId], references: [id])
+  id           Int        @id @default(autoincrement())
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  bookmark     Boolean
+  intensity    Int
+  sentiment    Sentiment
+  department   Department @relation(fields: [departmentId], references: [id])
   departmentId Int
-  audioUrl String
-  status Status
-  location Location @relation(fields: [locationId], references: [id])
-  locationId Int
+  audioUrls    Json
+  status       Status
+  location     Location   @relation(fields: [locationId], references: [id])
+  locationId   Int
 }
 
 model Location {
-  id Int @id @default(autoincrement())
-  name String
+  id       Int        @id @default(autoincrement())
+  name     String
   feedback Feedback[]
 }
 
 model Department {
-  id Int @id @default(autoincrement())
-  name String
+  id       Int        @id @default(autoincrement())
+  name     String
   feedback Feedback[]
 }
 

@@ -1,1 +1,6 @@
 aws_cfg.py
+audio_closedQuestion.mp3
+audio_closedQuestion.wav
+audio_openQuestion.mp3
+audio_openQuestion.wav
+__pycache__
