@@ -41,7 +41,7 @@ app.get(`/feedback/:id`, async (req, res) => {
 app.post(`/feedback`, async (req, res) => {
   const result = await prisma.feedback.create({
     data: {
-      audioUrls: req.body.audioUrl,
+      audioUrls: req.body.audioUrls,
       intensity: req.body.intensity,
       sentiment: req.body.sentiment,
       departmentId: req.body.departmentId,
