@@ -11,8 +11,6 @@ import boto3
 from botocore.exceptions import ClientError
 from aws_cfg import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
 import uuid
-import boto3
-
 
 ########### PHONE LOGIC ###########
 # Set up button on GPIO pin 26
@@ -20,6 +18,7 @@ button = Button(26)
 data_received = False
 data_sending = False
 should_continue = True
+data = {}
 
 def playAudio(audioFile):
     global should_continue
@@ -86,10 +85,10 @@ def getDepartment():
     
     # Get department
     print('Kies een nummer tussen 1 en 8 om een afdeling te selecteren:')
-    data["departmentId"] = input()
-    while data["departmentId"] not in ['1', '2', '3', '4', '5', '6', '7', '8']:
+    data["departmentId"] = int(input())
+    while data["departmentId"] not in [1, 2, 3, 4, 5, 6, 7, 8]:
         print('Geen correcte invoer, probeer opnieuw:')
-        data["departmentId"] = input()
+        data["departmentId"] = int(input())
     print('Je selecteerde', data["departmentId"])
 
     if not should_continue:
@@ -98,7 +97,7 @@ def getDepartment():
 
 def getUserFeedback():
     # Ask user about feedback about past event
-    playAudio('audio/department_questions/dep_' + data["departmentId"] + '.mp3')
+    playAudio('audio/department_questions/dep_' + str(data["departmentId"]) + '.mp3')
     
     # Record feedback on closed question
     recordAudio('closedQuestion')
@@ -109,7 +108,7 @@ def getUserFeedback():
 def getFeedbackStatus():
     # Ask if the feedback positive or negative
     playAudio('audio/open_question/open_question_p1.mp3')
-    playAudio('audio/departments/dep_' + data["departmentId"] + '.mp3')
+    playAudio('audio/departments/dep_' + str(data["departmentId"]) + '.mp3')
     playAudio('audio/open_question/open_question_p2.mp3')
 
     # Get sentiment
@@ -137,28 +136,38 @@ def getFeedbackIntensity():
 
     # Get intensity
     print('Kies een nummer tussen 1 en 9 om de ernst te selecteren:')
-    data["intensity"] = input()
-    while data["intensity"] not in ['1', '2', '3', '4', '5', '6', '7', '8', '9']:
+    data["intensity"] = int(input())
+    while data["intensity"] not in [1, 2, 3, 4, 5, 6, 7, 8, 9]:
         print('Geen correcte invoer, probeer opnieuw:')
-        data["intensity"] = input()
+        data["intensity"] = int(input())
     print('Je selecteerde', data["intensity"])
 
     if not should_continue:
         return
 
     # TODO: Play audio "Bedankt voor je feedback, je kan nu inhaken"
+    print('Je kan nu inhaken')
+    global data_received
+    data_received = True
 
 def resetProgram():
     global should_continue
     # Set the flag to False to indicate that the program should stop
     print('reseting program')
     should_continue = False
+    data = None
+    data["locationId"] = locationId
+    data_received = False
 
 # Set up a function that will run in the background while is running
 def check_button():
+    global data_received
     while True:
         if button.is_pressed:
             if data_received:
+                print("Data received, sending sound files and writing data...")
+                soundfile_path_closed = "audio_closedQuestion.mp3"
+                soundfile_path_open = "audio_openQuestion.mp3"
                 send_soundfile_and_write_data(data, soundfile_path_closed, soundfile_path_open)
             if not data_sending and not should_continue:
                 resetProgram()
@@ -169,8 +178,6 @@ button_thread = threading.Thread(target=check_button)
 button_thread.daemon = True
 button_thread.start()
 
-########### DIAL LOGIC ###########
-
 ########### DATA LOGIC ###########
 # Vars
 boto3.setup_default_session(aws_access_key_id=AWS_ACCESS_KEY_ID, aws_secret_access_key=AWS_SECRET_ACCESS_KEY)
@@ -179,9 +186,7 @@ random_id = uuid.uuid4()
 url =  "http://49.12.236.9:3000/feedback" #"http://localhost:3000/feedback"
 
 # Hardcoded data
-data = {
-    "locationId": 1,
-}
+locationId = 1
 
 def upload_to_s3(file_name, bucket, object_name=None):
     print("Uploading file to S3 bucket...")
@@ -197,7 +202,8 @@ def upload_to_s3(file_name, bucket, object_name=None):
         print(e)
         return False
     print("File uploaded successfully!")
-    return True
+    return True 
+
 
 def send_soundfile_and_write_data(data, soundfile_path_closed, soundfile_path_open):
     print("Sending sound files and writing data...")
@@ -221,6 +227,9 @@ def send_soundfile_and_write_data(data, soundfile_path_closed, soundfile_path_op
     # Add sound file URLs to data
     data["audioUrls"] = {"open": soundfile_url_open, "closed": soundfile_url_closed}
 
+    # Set locationId
+    data["locationId"] = locationId
+
     # Set sentiment
     if data["sentiment"] == "1":
         data["sentiment"] = "POSITIVE"
@@ -235,9 +244,8 @@ def send_soundfile_and_write_data(data, soundfile_path_closed, soundfile_path_op
         print(response.status_code)
         print("Failed to write data.")
 
-soundfile_path_closed = "audio_closedQuestion.mp3"
-soundfile_path_open = "audio_openQuestion.mp3"
-send_soundfile_and_write_data(data, soundfile_path_closed, soundfile_path_open)
+    # Reset program
+    resetProgram()
 
 ########### PHONE FLOW ###########
 while True:
@@ -247,5 +255,5 @@ while True:
         getUserFeedback()
         getFeedbackStatus()
         getPersonalFeedback()
-        getFeedbackSeverity()
+        getFeedbackIntensity()
     time.sleep(0.1)  # Add a short delay to reduce CPU usage
