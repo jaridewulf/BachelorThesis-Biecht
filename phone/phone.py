@@ -264,6 +264,7 @@ class Dial():
 
 def dailHandler():
     global data
+    global button
     dial = Dial()
     countrotary.when_deactivated = dial.addpulse
     countrotary.when_activated = dial.addpulse
@@ -271,6 +272,8 @@ def dailHandler():
     rotaryenable.when_deactivated = dial.stopcounting
 
     while True:
+        if button.is_pressed:
+            return 1
         if dial.number:
             return dial.number
         time.sleep(0.1)
