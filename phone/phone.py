@@ -25,10 +25,10 @@ pin_rotary_enable = 23    # red cable
 pin_count_rotary = 24    # orange cable
 pulses_per_number = 20
 rotaryenable = Button(23)
+countrotary = Button(24)
 
 # Phone logic vars
-countrotary = Button(24)
-button = Button(26)
+button = Button(19)
 data_received = False
 data_sending = False
 should_continue = True
@@ -183,6 +183,7 @@ def resetProgram():
     data = {}
     data["locationId"] = locationId
     data_received = False
+    pygame.mixer.music.stop()
 
 ########### DATA LOGIC ###########
 def upload_to_s3(file_name, bucket, object_name=None):
@@ -308,8 +309,6 @@ def check_button():
                 resetProgram()
         # Handle rotary dial events
         if dial.number:
-            # Update the global data variable with the selected department
-            data["departmentId"] = dial.number
             dial.number = 0  # Reset dial number
         time.sleep(0.1)
 
@@ -320,13 +319,20 @@ button_thread.daemon = True
 button_thread.start()
 
 ########### PHONE FLOW ###########
+def phoneFlow():
+    global button
+    greetUser()
+    getDepartment()
+    # getUserFeedback()
+    # getFeedbackStatus()
+    # getPersonalFeedback()
+    # getFeedbackIntensity()
+    if button.is_pressed:
+        resetProgram()
+        return
+
 while True:
     if not button.is_pressed and not data_sending and not data_received:
-        greetUser()
-        getDepartment()
-        getUserFeedback()
-        getFeedbackStatus()
-        getPersonalFeedback()
-        getFeedbackIntensity()
+        phoneFlow()
     dialed_number = dailHandler()  # Wait for rotary dial input
     time.sleep(0.1)  # Add a short delay to reduce CPU usage
