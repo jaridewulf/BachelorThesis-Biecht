@@ -11,15 +11,33 @@ import boto3
 from botocore.exceptions import ClientError
 from aws_cfg import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
 import uuid
+import os
+import math
 
-########### PHONE LOGIC ###########
-# Set up button on GPIO pin 26
+########### GENERAL VARS ###########
+# Rotary dial vars
+pin_rotary_enable = 23    # red cable
+pin_count_rotary = 24    # orange cable
+pulses_per_number = 20
+rotaryenable = Button(23)
+
+# Phone logic vars
+countrotary = Button(24)
 button = Button(26)
 data_received = False
 data_sending = False
 should_continue = True
 data = {}
 
+# Data logic vars
+boto3.setup_default_session(aws_access_key_id=AWS_ACCESS_KEY_ID, aws_secret_access_key=AWS_SECRET_ACCESS_KEY)
+object_name = None
+random_id = uuid.uuid4()
+url =  "http://49.12.236.9:3000/feedback" #"http://localhost:3000/feedback"
+### CHANGE TO FIT LOCATION ###
+locationId = 1
+
+########### PHONE LOGIC ###########
 def playAudio(audioFile):
     global should_continue
     # Reset the flag to True at the start of each function
@@ -85,10 +103,10 @@ def getDepartment():
     
     # Get department
     print('Kies een nummer tussen 1 en 8 om een afdeling te selecteren:')
-    data["departmentId"] = int(input())
+    data["departmentId"] = int(dailHandler())
     while data["departmentId"] not in [1, 2, 3, 4, 5, 6, 7, 8]:
         print('Geen correcte invoer, probeer opnieuw:')
-        data["departmentId"] = int(input())
+        data["departmentId"] = int(dailHandler())
     print('Je selecteerde', data["departmentId"])
 
     if not should_continue:
@@ -112,17 +130,18 @@ def getFeedbackStatus():
     playAudio('audio/open_question/open_question_p2.mp3')
 
     # Get sentiment
-    data["sentiment"] = input("Enter 1 for positive feedback or 2 for negative feedback: ")
-    while data["sentiment"] not in ['1', '2']:
+    print("Enter 1 for positive feedback or 2 for negative feedback:")
+    data["sentiment"] = int(dailHandler())
+    while data["sentiment"] not in [1, 2]:
         print("Invalid input. Please enter 1 for positive feedback or 2 for negative feedback.")
-        data["sentiment"] = input("Enter 1 for positive feedback or 2 for negative feedback: ")
+        data["sentiment"] = int(dailHandler())
 
     if not should_continue:
         return
 
 def getPersonalFeedback():
     # Ask for personal feedback
-    playAudio('audio/sentiment/sentiment_' + data["sentiment"] + '.mp3')
+    playAudio('audio/sentiment/sentiment_' + str(data["sentiment"]) + '.mp3')
     
     # Record feedback on open question
     recordAudio('openQuestion')
@@ -136,10 +155,10 @@ def getFeedbackIntensity():
 
     # Get intensity
     print('Kies een nummer tussen 1 en 9 om de ernst te selecteren:')
-    data["intensity"] = int(input())
+    data["intensity"] = int(dailHandler())
     while data["intensity"] not in [1, 2, 3, 4, 5, 6, 7, 8, 9]:
         print('Geen correcte invoer, probeer opnieuw:')
-        data["intensity"] = int(input())
+        data["intensity"] = int(dailHandler())
     print('Je selecteerde', data["intensity"])
 
     if not should_continue:
@@ -152,42 +171,15 @@ def getFeedbackIntensity():
 
 def resetProgram():
     global should_continue
+    global data_received
     # Set the flag to False to indicate that the program should stop
     print('reseting program')
     should_continue = False
-    data = None
+    data = {}
     data["locationId"] = locationId
     data_received = False
 
-# Set up a function that will run in the background while is running
-def check_button():
-    global data_received
-    while True:
-        if button.is_pressed:
-            if data_received:
-                print("Data received, sending sound files and writing data...")
-                soundfile_path_closed = "audio_closedQuestion.mp3"
-                soundfile_path_open = "audio_openQuestion.mp3"
-                send_soundfile_and_write_data(data, soundfile_path_closed, soundfile_path_open)
-            if not data_sending and not should_continue:
-                resetProgram()
-
-# Start a new thread that will run the check_button function
-button_thread = threading.Thread(target=check_button)
-# Set the thread as a daemon so it will automatically exit when the main program exits
-button_thread.daemon = True
-button_thread.start()
-
 ########### DATA LOGIC ###########
-# Vars
-boto3.setup_default_session(aws_access_key_id=AWS_ACCESS_KEY_ID, aws_secret_access_key=AWS_SECRET_ACCESS_KEY)
-object_name = None
-random_id = uuid.uuid4()
-url =  "http://49.12.236.9:3000/feedback" #"http://localhost:3000/feedback"
-
-# Hardcoded data
-locationId = 1
-
 def upload_to_s3(file_name, bucket, object_name=None):
     print("Uploading file to S3 bucket...")
     # If S3 object_name was not specified, use file_name
@@ -231,9 +223,9 @@ def send_soundfile_and_write_data(data, soundfile_path_closed, soundfile_path_op
     data["locationId"] = locationId
 
     # Set sentiment
-    if data["sentiment"] == "1":
+    if data["sentiment"] == 1:
         data["sentiment"] = "POSITIVE"
-    elif data["sentiment"] == "2":
+    elif data["sentiment"] == 2:
         data["sentiment"] = "NEGATIVE"
 
     # Write data to the specified URL
@@ -247,6 +239,81 @@ def send_soundfile_and_write_data(data, soundfile_path_closed, soundfile_path_op
     # Reset program
     resetProgram()
 
+########### DIAL LOGIC ###########  
+class Dial():
+    # Handling rotary dial input.
+    def __init__(self):
+        # Initialize
+        self.pulses = 0
+        self.number = 0
+        self.counting = False  # Set counting to False initially
+
+    def startcounting(self):
+        # Start counting pulses
+        self.counting = True
+
+    def stopcounting(self):
+        # Stop counting, calculate dialed number and reset values
+        if self.counting:
+            # Calculate dialed number
+            if self.pulses > 0:
+                if math.floor(self.pulses / pulses_per_number) >= 10:
+                    self.number = 0
+                else:
+                    self.number = math.ceil((self.pulses / pulses_per_number))
+                print("Pulses: %s" % self.pulses)
+                print("The number %s was dialed" % self.number)
+            else:
+                print("No input detected")
+        # Reset values
+        self.counting = False
+        self.pulses = 0
+
+    def addpulse(self):
+        # Add pulse to the count
+        if self.counting:
+            self.pulses += 1
+
+def dailHandler():
+    global data
+    dial = Dial()
+    countrotary.when_deactivated = dial.addpulse
+    countrotary.when_activated = dial.addpulse
+    rotaryenable.when_activated = dial.startcounting
+    rotaryenable.when_deactivated = dial.stopcounting
+
+    while True:
+        if dial.number:
+            return dial.number
+        time.sleep(0.1)
+
+########### THREADING ENABLE ###########
+# Set up a function that will run in the background while is running
+def check_button():
+    global data_received
+    dial = Dial()
+    while True:
+        if button.is_pressed:
+            if data_received:
+                print("Data received, sending sound files and writing data...")
+                soundfile_path_closed = "audio_closedQuestion.mp3"
+                soundfile_path_open = "audio_openQuestion.mp3"
+                send_soundfile_and_write_data(data, soundfile_path_closed, soundfile_path_open)
+            if not data_sending and not should_continue:
+                resetProgram()
+        # Handle rotary dial events
+        if dial.number:
+            # Update the global data variable with the selected department
+            data["departmentId"] = dial.number
+            dial.number = 0  # Reset dial number
+        time.sleep(0.1)
+
+# Start a new thread that will run the check_button function
+button_thread = threading.Thread(target=check_button)
+# Set the thread as a daemon so it will automatically exit when the main program exits
+button_thread.daemon = True
+button_thread.start()
+
 ########### PHONE FLOW ###########
 while True:
     if not button.is_pressed and not data_sending and not data_received:
@@ -256,4 +323,5 @@ while True:
         getFeedbackStatus()
         getPersonalFeedback()
         getFeedbackIntensity()
+    dialed_number = dailHandler()  # Wait for rotary dial input
     time.sleep(0.1)  # Add a short delay to reduce CPU usage
