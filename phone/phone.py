@@ -137,6 +137,7 @@ def getPersonalFeedback():
 
 
 def getFeedbackIntensity():
+    global data_received
     # Ask if the feedback positive or negative
     playAudio('audio/get_severity.mp3')
 
@@ -149,9 +150,8 @@ def getFeedbackIntensity():
     print('Je selecteerde', data["intensity"])
 
     # TODO: Play audio "Bedankt voor je feedback, je kan nu inhaken"
-    print('Je kan nu inhaken')
-    global data_received
     data_received = True
+    print('Je kan nu inhaken')
 
 def resetProgram():
     global data_received
@@ -278,6 +278,29 @@ def dailHandler():
             return dial.number
         time.sleep(0.1)
 
+########### PHONE FLOW ###########
+def phoneFlow():
+    if not data_received:
+        global reset_handled
+        reset_handled = False
+        print('entered phone flow')
+        global button
+        print('phone flow started')
+        while not button.is_pressed:
+            greetUser()
+            getDepartment()
+            getUserFeedback()
+            getFeedbackStatus()
+            getPersonalFeedback()
+            getFeedbackIntensity()
+            return
+        else:
+            resetProgram()
+            return
+    else:
+        return
+    
+
 ########### THREADING ENABLE ###########
 # Set up a function that will run in the background while is running
 def check_button():
@@ -285,6 +308,7 @@ def check_button():
     dial = Dial()
     while True:
         if button.is_pressed:
+            print("Button pressed")
             if data_received:
                 print("Data received, sending sound files and writing data...")
                 soundfile_path_closed = "audio_closedQuestion.mp3"
@@ -304,24 +328,6 @@ button_thread = threading.Thread(target=check_button)
 # Set the thread as a daemon so it will automatically exit when the main program exits
 button_thread.daemon = True
 button_thread.start()
-
-########### PHONE FLOW ###########
-def phoneFlow():
-    global reset_handled
-    reset_handled = False
-    print('entered phone flow')
-    global button
-    print('phone flow started')
-    while not button.is_pressed:
-        greetUser()
-        getDepartment()
-        # getUserFeedback()
-        # getFeedbackStatus()
-        # getPersonalFeedback()
-        # getFeedbackIntensity()
-    else:
-        resetProgram()
-        return
 
 
 while True:
