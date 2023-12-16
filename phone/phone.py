@@ -1,18 +1,23 @@
+########### IMPORTS ###########
+# Standard Library Imports
+import threading
+import time
+import uuid
+import math
+
+# Third-Party Library Imports
 import pygame
 import sounddevice as sd
 from scipy.io.wavfile import write
 import numpy as np
 from pydub import AudioSegment
 from gpiozero import Button
-import threading
-import time
 import requests
 import boto3
 from botocore.exceptions import ClientError
+
+# Local Module Imports
 from aws_cfg import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
-import uuid
-import os
-import math
 
 ########### GENERAL VARS ###########
 # Rotary dial vars
