@@ -20,6 +20,13 @@ from botocore.exceptions import ClientError
 from aws_cfg import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
 
 ########### GENERAL VARS ###########
+# Audio vars
+fs = 48000  # Sample rate
+silence_threshold = 0.02  # Silence threshold
+silence_duration = 3  # Duration of silence in seconds
+pygame.init()
+pygame.mixer.init()
+
 # Rotary dial vars
 pin_rotary_enable = 23    # red cable
 pin_count_rotary = 24    # orange cable
@@ -31,8 +38,8 @@ countrotary = Button(24)
 button = Button(19)
 data_received = False
 data_sending = False
-should_continue = True
 data = {}
+reset_handled = True
 
 # Data logic vars
 boto3.setup_default_session(aws_access_key_id=AWS_ACCESS_KEY_ID, aws_secret_access_key=AWS_SECRET_ACCESS_KEY)
@@ -44,40 +51,28 @@ locationId = 1
 
 ########### PHONE LOGIC ###########
 def playAudio(audioFile):
-    global should_continue
     # Reset the flag to True at the start of each function
-    should_continue = True
     # Play audio file
     pygame.mixer.init()
     pygame.mixer.music.load(audioFile)
     pygame.mixer.music.play()
-    while pygame.mixer.music.get_busy() == True and should_continue:
+    while pygame.mixer.music.get_busy() == True:
         continue
-    if not should_continue:
-        pygame.mixer.music.stop()
 
 def recordAudio(postion):
-    global should_continue
-    # Reset the flag to True at the start of each function
-    should_continue = True
     # Record audio from the microphone
-    fs = 48000  # Sample rate
-    silence_threshold = 0.02  # Silence threshold
-    silence_duration = 3  # Duration of silence in seconds
     buffer = np.array([])  # Buffer to store audio
     silence_duration_current = 0  # Current duration of silence
 
     print("Start talking")
     with sd.InputStream(samplerate=fs, channels=1) as stream:
-        while should_continue:
+        while True:
             audio = stream.read(1024)[0]  # Read audio from the microphone
             buffer = np.append(buffer, audio)  # Append audio to the buffer
             if np.abs(audio).mean() < silence_threshold:  # If silence is detected
                 silence_duration_current += len(audio) / fs  # Increase current duration of silence
                 if silence_duration_current > silence_duration:  # If silence duration is reached
                     break  # Stop recording
-                if not should_continue:
-                    break # Stop recording
             else:
                 silence_duration_current = 0  # Reset current duration of silence
     print("Recording finished")
@@ -96,9 +91,6 @@ def recordAudio(postion):
 
 def greetUser():
     time.sleep(2.5)
-    # Set reset state to false
-    global should_continue
-    should_continue = True
     # Play greeting audio
     playAudio('audio/greeting.mp3')
 
@@ -114,9 +106,6 @@ def getDepartment():
         data["departmentId"] = int(dailHandler())
     print('Je selecteerde', data["departmentId"])
 
-    if not should_continue:
-        return
-
 
 def getUserFeedback():
     # Ask user about feedback about past event
@@ -124,9 +113,6 @@ def getUserFeedback():
     
     # Record feedback on closed question
     recordAudio('closedQuestion')
-
-    if not should_continue:
-        return
 
 def getFeedbackStatus():
     # Ask if the feedback positive or negative
@@ -141,8 +127,6 @@ def getFeedbackStatus():
         print("Invalid input. Please enter 1 for positive feedback or 2 for negative feedback.")
         data["sentiment"] = int(dailHandler())
 
-    if not should_continue:
-        return
 
 def getPersonalFeedback():
     # Ask for personal feedback
@@ -151,8 +135,6 @@ def getPersonalFeedback():
     # Record feedback on open question
     recordAudio('openQuestion')
 
-    if not should_continue:
-        return
 
 def getFeedbackIntensity():
     # Ask if the feedback positive or negative
@@ -166,24 +148,24 @@ def getFeedbackIntensity():
         data["intensity"] = int(dailHandler())
     print('Je selecteerde', data["intensity"])
 
-    if not should_continue:
-        return
-
     # TODO: Play audio "Bedankt voor je feedback, je kan nu inhaken"
     print('Je kan nu inhaken')
     global data_received
     data_received = True
 
 def resetProgram():
-    global should_continue
     global data_received
-    # Set the flag to False to indicate that the program should stop
+    global reset_handled
+    if reset_handled:
+        return
+    # Handle resetting the program
     print('reseting program')
-    should_continue = False
     data = {}
     data["locationId"] = locationId
     data_received = False
-    pygame.mixer.music.stop()
+    if pygame:
+        pygame.mixer.music.stop()
+    reset_handled = True
 
 ########### DATA LOGIC ###########
 def upload_to_s3(file_name, bucket, object_name=None):
@@ -305,8 +287,10 @@ def check_button():
                 soundfile_path_closed = "audio_closedQuestion.mp3"
                 soundfile_path_open = "audio_openQuestion.mp3"
                 send_soundfile_and_write_data(data, soundfile_path_closed, soundfile_path_open)
-            if not data_sending and not should_continue:
+            if not data_sending:
                 resetProgram()
+        if not button.is_pressed and not data_sending and not data_received:
+            phoneFlow()
         # Handle rotary dial events
         if dial.number:
             dial.number = 0  # Reset dial number
@@ -320,19 +304,23 @@ button_thread.start()
 
 ########### PHONE FLOW ###########
 def phoneFlow():
+    global reset_handled
+    reset_handled = False
+    print('entered phone flow')
     global button
-    greetUser()
-    getDepartment()
-    # getUserFeedback()
-    # getFeedbackStatus()
-    # getPersonalFeedback()
-    # getFeedbackIntensity()
-    if button.is_pressed:
+    print('phone flow started')
+    while not button.is_pressed:
+        greetUser()
+        getDepartment()
+        # getUserFeedback()
+        # getFeedbackStatus()
+        # getPersonalFeedback()
+        # getFeedbackIntensity()
+    else:
         resetProgram()
         return
 
+
 while True:
-    if not button.is_pressed and not data_sending and not data_received:
-        phoneFlow()
     dialed_number = dailHandler()  # Wait for rotary dial input
     time.sleep(0.1)  # Add a short delay to reduce CPU usage
