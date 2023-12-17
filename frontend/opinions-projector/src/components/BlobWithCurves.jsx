@@ -7,11 +7,11 @@ const BlobWithCurves = ({ feedbackData }) => {
   const height = 400;
   const center = { x: width / 2, y: height / 2 };
   const maxRadius = Math.max(width, height) / 2 - 10;
-  const fill = "rgba(0, 120, 255, 1)";
 
   // Set Data
   const [intensity, setIntensity] = useState([]);
   const [tensionValue, setTensionValue] = useState(0);
+  const [fill, setFill] = useState(`rgba(0, 120, 255, 1)`);
 
   // Calculate tension
   const calculateTension = (sentiment) => {
@@ -21,6 +21,7 @@ const BlobWithCurves = ({ feedbackData }) => {
         return newTensionValue;
       });
     }
+    setFill(`rgba(0, 120, 255, ${tensionValue})`);
   };
 
   useEffect(() => {
