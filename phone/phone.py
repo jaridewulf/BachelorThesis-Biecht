@@ -187,6 +187,8 @@ def upload_to_s3(file_name, bucket, object_name=None):
 
 def send_soundfile_and_write_data(data, soundfile_path_closed, soundfile_path_open):
     print("Sending sound files and writing data...")
+    global data_sending
+    random_id = uuid.uuid4()
     # Send sound files to S3 bucket
     bucket = "debiecht-audio-files"
     object_name_closed = upload_to_s3(soundfile_path_closed, bucket)
