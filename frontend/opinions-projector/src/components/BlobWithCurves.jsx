@@ -1,17 +1,17 @@
 import { CardinalClosedCurve } from "react-svg-curve";
 import { useEffect, useState } from "react";
 
-const BlobWithCurves = ({ feedbackData }) => {
-  // Variables
-  const width = 400;
-  const height = 400;
-  const center = { x: width / 2, y: height / 2 };
-  const maxRadius = Math.max(width, height) / 2 - 10;
-
+const BlobWithCurves = ({ feedbackData, bigBlob }) => {
   // Set Data
   const [intensity, setIntensity] = useState([]);
   const [tensionValue, setTensionValue] = useState(0);
   const [fill, setFill] = useState(`rgba(0, 120, 255, 1)`);
+  const [width] = useState(bigBlob ? 400 : 200);
+  const [height] = useState(bigBlob ? 400 : 200);
+
+  // Variables
+  const center = { x: width / 2, y: height / 2 };
+  const maxRadius = Math.max(width, height) / 2 - 10;
 
   // Calculate tension
   const calculateTension = (sentiment) => {
@@ -21,7 +21,7 @@ const BlobWithCurves = ({ feedbackData }) => {
         return newTensionValue;
       });
     }
-    setFill(`rgba(0, 120, 255, ${tensionValue})`);
+    setFill(`rgba(0, 120, 255, ${tensionValue + 0.1})`);
   };
 
   useEffect(() => {
@@ -61,17 +61,21 @@ const BlobWithCurves = ({ feedbackData }) => {
     ),
   ]);
 
-  return (
-    <svg width={width} height={height} xmlns="http://www.w3.org/2000/svg">
-      <CardinalClosedCurve
-        data={coordinates}
-        tension={tensionValue}
-        fill={fill}
-        showPoints={false}
-        strokeWidth={0}
-      />
-    </svg>
-  );
+  if (width) {
+    return (
+      <svg width={width} height={height} xmlns="http://www.w3.org/2000/svg">
+        <CardinalClosedCurve
+          data={coordinates}
+          tension={tensionValue}
+          fill={fill}
+          showPoints={false}
+          strokeWidth={0}
+        />
+      </svg>
+    );
+  } else {
+    return null;
+  }
 };
 
 export default BlobWithCurves;

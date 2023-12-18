@@ -10,7 +10,7 @@ function App() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('http://49.12.236.9:3000/feedback');
+        const response = await fetch('http://localhost:3000/feedback'); // http://49.12.236.9:3000/feedback
         const data = await response.json();
         setFeedbackData(data);
       } catch (error) {
@@ -40,18 +40,26 @@ function App() {
 
   return (
     <>
-      <div style={{ position: "relative" }}>
-        <BlobWithCurves feedbackData={feedbackData} />
+      <div className="blob__center" style={{
+        position: "absolute",
+        top: "30vh",
+        left: "40vw"
+      }}>
+        <BlobWithCurves feedbackData={feedbackData} bigBlob={true} />
+      </div>
+      <div>
         {groupedFeedbackData.slice(1).map((group, index) => (
-          <BlobWithCurves
-            key={group.departmentId}
-            feedbackData={group.items}
-            style={{
-              position: "absolute",
-              top: `${50 + 100 * Math.sin((2 * Math.PI * index) / groupedFeedbackData.length)}%`,
-              left: `${50 + 100 * Math.cos((2 * Math.PI * index) / groupedFeedbackData.length)}%`,
-            }}
-          />
+          <div style={{
+            position: "absolute",
+            top: `calc(40vh + ${40 * Math.sin((2 * Math.PI * index) / (groupedFeedbackData.length - 1))}%`,
+            left: `calc(45vw + ${30 * Math.cos((2 * Math.PI * index) / (groupedFeedbackData.length - 1))}%`,
+          }}>
+            <BlobWithCurves
+              key={group.departmentId}
+              feedbackData={group.items}
+
+            />
+          </div>
         ))}
       </div>
     </>
