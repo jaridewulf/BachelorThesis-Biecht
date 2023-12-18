@@ -21,7 +21,7 @@ const BlobWithCurves = ({ feedbackData, bigBlob }) => {
         return newTensionValue;
       });
     }
-    setFill(`rgba(0, 120, 255, ${tensionValue + 0.1})`);
+    setFill(`rgba(0, 120, 255, ${1 - tensionValue + 0.2})`);
   };
 
   useEffect(() => {
