@@ -34,6 +34,7 @@ model Location {
 model Department {
   id       Int        @id @default(autoincrement())
   name     String
+  color    String
   feedback Feedback[]
 }
 
