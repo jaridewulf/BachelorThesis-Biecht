@@ -20,7 +20,7 @@ services:
     ports:
       - "5433:80"
     environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGAMDIN_USER}
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_USER}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
     volumes:
       - ./_data/pgadmin:/var/lib/pgadmin
