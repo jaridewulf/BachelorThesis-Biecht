@@ -10,7 +10,7 @@ function App() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('http://localhost:3000/feedback'); // http://49.12.236.9:3000/feedback
+        const response = await fetch('http://http://49.12.236.9:3000/feedback'); // http://49.12.236.9:3000/feedback
         const data = await response.json();
         setFeedbackData(data);
       } catch (error) {
