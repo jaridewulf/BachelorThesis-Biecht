@@ -7,27 +7,35 @@ const departments = ['Ruimte', 'Dienstverlening en Sociaal Beleid', 'Vrije Tijd'
 
 const departmentData: Prisma.DepartmentCreateInput[] = [
   {
-    name: 'Ruimte'
+    name: 'Ruimte',
+    color: '#52277b'
   },
   {
-    name: 'Dienstverlening en Sociaal Beleid'
+    name: 'Dienstverlening en Sociaal Beleid',
+    color: '#941f09'
   },
   {
-    name: 'Vrije Tijd'
+    name: 'Vrije Tijd',
+    color: '#009a4e'
   },
   {
-    name: 'Zorg'
+    name: 'Zorg',
+    color: '#f3bf41'
   },
   {
-    name: 'Bestuur en Communicatie'
+    name: 'Bestuur en Communicatie',
+    color: '#123274'
   },
   {
-    name: 'Personeel'
+    name: 'Personeel',
+    color: '#0065b0'
   },
   {
-    name: 'Financiën'
+    name: 'Financiën',
+    color: '#004c4b'
   }, {
-    name: 'Digitale Transformatie'
+    name: 'Digitale Transformatie',
+    color: '#e8366f'
   }
 ]
 

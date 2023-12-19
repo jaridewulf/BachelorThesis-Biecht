@@ -3,6 +3,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
 }
 
 datasource db {
@@ -34,6 +35,7 @@ model Location {
 model Department {
   id       Int        @id @default(autoincrement())
   name     String
+  color    String
   feedback Feedback[]
 }
 
