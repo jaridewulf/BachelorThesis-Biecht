@@ -45,7 +45,7 @@ reset_handled = True
 boto3.setup_default_session(aws_access_key_id=AWS_ACCESS_KEY_ID, aws_secret_access_key=AWS_SECRET_ACCESS_KEY)
 object_name = None
 random_id = uuid.uuid4()
-url =  "http://49.12.236.9:3000/feedback" #"http://localhost:3000/feedback"
+url =  "https://api-debiecht.jaridewulf.be/" #"http://localhost:3000/feedback"
 ### CHANGE TO FIT LOCATION ###
 locationId = 1
 
