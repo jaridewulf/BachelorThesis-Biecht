@@ -10,13 +10,17 @@ services:
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.mytlschallenge.acme.tlschallenge=true"
+      - "--certificatesresolvers.mytlschallenge.acme.email=jari.de.wulf1999@gmail.com"
+      - "--certificatesresolvers.mytlschallenge.acme.storage=/acme.json"
     ports:
       - "80:80"
       - "443:443"
       - "8080:8080" # Traefik dashboard
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-    labels:
+      - ./acme.json:/acme.json    
+      labels:
       - "traefik.enable=true"
       - "traefik.http.routers.traefik.rule=Host(`traefik.jaridewulf.be`)" # Change jaridewulf.be to your actual domain
       - "traefik.http.routers.traefik.entrypoints=web"
@@ -56,6 +60,8 @@ services:
       - "traefik.http.routers.api.rule=Host(`api-debiecht.jaridewulf.be`)"
       - "traefik.http.routers.api.entrypoints=websecure"
       - "traefik.http.services.api.loadbalancer.server.port=3000"
+      - "traefik.http.routers.api.tls.certresolver=mytlschallenge"
+      - "traefik.http.routers.api.tls=true"
     environment:
       DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@biecht-postgres:5432/${POSTGRES_DB}
     build:
@@ -72,6 +78,8 @@ services:
       - "traefik.http.routers.projection.rule=Host(`projection-debiecht.jaridewulf.be`)"
       - "traefik.http.routers.projection.entrypoints=websecure"
       - "traefik.http.services.projection.loadbalancer.server.port=80"
+      - "traefik.http.routers.projection.tls.certresolver=mytlschallenge"
+      - "traefik.http.routers.projection.tls=true"
     build:
       context: .
       dockerfile: ./containers/projection/Dockerfile
@@ -86,6 +94,8 @@ services:
       - "traefik.http.routers.dashboard.rule=Host(`debiecht.jaridewulf.be`)"
       - "traefik.http.routers.dashboard.entrypoints=websecure"
       - "traefik.http.services.dashboard.loadbalancer.server.port=80"
+      - "traefik.http.routers.dashboard.tls.certresolver=mytlschallenge"
+      - "traefik.http.routers.dashboard.tls=true"
     build:
       context: .
       dockerfile: ./containers/dashboard/Dockerfile
