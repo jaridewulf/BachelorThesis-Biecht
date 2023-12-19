@@ -1,6 +1,7 @@
 import "./App.css";
 import { useState, useEffect } from "react";
 import BlobWithCurves from "./components/BlobWithCurves";
+import LegendItem from "./components/LegendItem"; // Import LegendItem component
 
 function App() {
   const [feedbackData, setFeedbackData] = useState([]);
@@ -44,19 +45,21 @@ function App() {
 
   return (
     <>
-      <div className="blob__center" style={{
-        position: "absolute",
-        top: "30vh",
-        left: "40vw"
-      }}>
+      <div
+        className={"main__blob"}
+        style={{
+          position: "absolute",
+          top: "30vh",
+          left: "40vw"
+        }}>
         <BlobWithCurves feedbackData={feedbackData} bigBlob={true} color="#E30613" />
       </div>
-      <div>
-        {groupedFeedbackData && groupedFeedbackData.slice(1).map((group, index) => (
+      <div className={"departments"}>
+        {groupedFeedbackData && groupedFeedbackData.slice(0).map((group, index) => (
           <div key={group.departmentId} style={{
             position: "absolute",
-            top: `calc(40vh + ${40 * Math.sin((2 * Math.PI * index) / (groupedFeedbackData.length - 1))}%)`,
-            left: `calc(45vw + ${30 * Math.cos((2 * Math.PI * index) / (groupedFeedbackData.length - 1))}%)`,
+            top: `calc(40vh + ${40 * Math.sin((2 * Math.PI * index) / (groupedFeedbackData.length))}%)`,
+            left: `calc(45vw + ${30 * Math.cos((2 * Math.PI * index) / (groupedFeedbackData.length))}%)`,
           }}>
             <BlobWithCurves
               key={group.departmentId}
@@ -64,6 +67,12 @@ function App() {
               color={group.color}
             />
           </div>
+        ))}
+      </div>
+      <div style={{ left: 0 }}>
+        <LegendItem color="#E30613" name="Stad Kortrijk" />
+        {departments.map((department) => (
+          <LegendItem key={department.id} color={department.color} name={department.name} />
         ))}
       </div>
     </>
