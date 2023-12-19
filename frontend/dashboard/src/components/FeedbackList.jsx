@@ -7,7 +7,7 @@ const FeedbackList = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch('http://49.12.236.9:3000/feedback');
+                const response = await fetch('https://api-debiecht.jaridewulf.be/feedback');
                 const data = await response.json();
                 setFeedbackData(data);
             } catch (error) {
