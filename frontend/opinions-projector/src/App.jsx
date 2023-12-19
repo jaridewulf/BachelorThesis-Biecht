@@ -11,11 +11,11 @@ function App() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const responseFeedback = await fetch('http://172.18.0.1:3000/feedback');
+        const responseFeedback = await fetch('https://api-debiecht.jaridewulf.be/feedback');
         const dataFeedback = await responseFeedback.json();
         setFeedbackData(dataFeedback);
 
-        const responseDepartments = await fetch('http://172.18.0.1:3000/departments');
+        const responseDepartments = await fetch('https://api-debiecht.jaridewulf.be/departments');
         const dataDepartments = await responseDepartments.json();
         setDepartments(dataDepartments);
 
