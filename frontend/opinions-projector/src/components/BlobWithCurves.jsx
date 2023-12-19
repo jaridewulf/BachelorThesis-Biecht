@@ -13,8 +13,6 @@ const BlobWithCurves = ({ feedbackData, bigBlob, color }) => {
   const center = { x: width / 2, y: height / 2 };
   const maxRadius = Math.max(width, height) / 2 - 10;
 
-  console.log(feedbackData);
-
   // Calculate tension
   const calculateTension = (sentiment) => {
     if (sentiment === "NEGATIVE") {
