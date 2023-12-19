@@ -14,7 +14,7 @@ When we change anything about the database models:
 npx prisma migrate dev
 ```
 
-Remove all data from databse
+Remove all data from database
 ```sh
 npx prisma migrate reset
 ```
