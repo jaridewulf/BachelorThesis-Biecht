@@ -1,17 +1,19 @@
 import { CardinalClosedCurve } from "react-svg-curve";
 import { useEffect, useState } from "react";
 
-const BlobWithCurves = ({ feedbackData, bigBlob }) => {
+const BlobWithCurves = ({ feedbackData, bigBlob, color }) => {
   // Set Data
   const [intensity, setIntensity] = useState([]);
   const [tensionValue, setTensionValue] = useState(0);
-  const [fill, setFill] = useState(`rgba(0, 120, 255, 1)`);
+  const [fill, setFill] = useState("#ffffff");
   const [width] = useState(bigBlob ? 400 : 200);
   const [height] = useState(bigBlob ? 400 : 200);
 
   // Variables
   const center = { x: width / 2, y: height / 2 };
   const maxRadius = Math.max(width, height) / 2 - 10;
+
+  console.log(feedbackData);
 
   // Calculate tension
   const calculateTension = (sentiment) => {
@@ -21,7 +23,15 @@ const BlobWithCurves = ({ feedbackData, bigBlob }) => {
         return newTensionValue;
       });
     }
-    setFill(`rgba(0, 120, 255, ${1 - tensionValue + 0.2})`);
+    hexToRgba(color, tensionValue);
+  };
+
+  // Convert hex to rgba
+  const hexToRgba = (color) => {
+    const r = parseInt(color.slice(1, 3), 16);
+    const g = parseInt(color.slice(3, 5), 16);
+    const b = parseInt(color.slice(5, 7), 16);
+    setFill(`rgba(${r}, ${g}, ${b}, ${1 - tensionValue + 0.2})`);
   };
 
   useEffect(() => {
