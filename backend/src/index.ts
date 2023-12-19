@@ -15,6 +15,12 @@ app.get('/', async (req, res) => {
   res.send('API de biecht is online');
 });
 
+// send back all departments
+app.get(`/departments`, async (req, res) => {
+  const departments = await prisma.department.findMany()
+  res.json(departments)
+});
+
 // send back all feedbacks
 app.get(`/feedback`, async (req, res) => {
   if (req.body?.departmentId) {
