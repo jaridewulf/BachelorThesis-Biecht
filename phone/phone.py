@@ -171,6 +171,7 @@ def resetProgram():
 def upload_to_s3(file_name, bucket, object_name=None):
     print("Uploading file to S3 bucket...")
     # If S3 object_name was not specified, use file_name
+    global random_id
     if object_name is None:
         object_name = str(random_id) + "_" + str(file_name)
 
@@ -188,6 +189,7 @@ def upload_to_s3(file_name, bucket, object_name=None):
 def send_soundfile_and_write_data(data, soundfile_path_closed, soundfile_path_open):
     print("Sending sound files and writing data...")
     global data_sending
+    global random_id
     random_id = uuid.uuid4()
     # Send sound files to S3 bucket
     bucket = "debiecht-audio-files"
@@ -310,7 +312,6 @@ def check_button():
     dial = Dial()
     while True:
         if button.is_pressed:
-            print("Button pressed")
             if data_received:
                 print("Data received, sending sound files and writing data...")
                 soundfile_path_closed = "audio_closedQuestion.mp3"
