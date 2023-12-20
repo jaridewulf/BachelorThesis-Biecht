@@ -1,26 +1,16 @@
+@font-face {
+  font-family: 'Exo 2';
+  src: url(FONT_FILE_NAME.woff2) format('woff2');
+}
+
 #root {
-  max-width: 1280px;
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
+  font-family: "Exo 2", sans-serif;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
-}
-
-@keyframes logo-spin {
+@keyframes rotateAnimation {
   from {
     transform: rotate(0deg);
   }
@@ -30,16 +20,42 @@
   }
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.main__blob {
+  animation: rotateAnimation infinite 70s linear;
 }
 
-.card {
-  padding: 2em;
+.departments> :nth-child(1) {
+  animation: rotateAnimation 70s infinite 0.5s reverse;
 }
 
-.read-the-docs {
-  color: #888;
+.departments> :nth-child(2) {
+  animation: rotateAnimation 70s infinite 1s normal;
+}
+
+.departments> :nth-child(3) {
+  animation: rotateAnimation 70s infinite 1.5s reverse;
+}
+
+.departments> :nth-child(4) {
+  animation: rotateAnimation 70s infinite 2s normal;
+}
+
+.departments> :nth-child(5) {
+  animation: rotateAnimation 70s infinite 0.5s reverse;
+}
+
+.departments> :nth-child(6) {
+  animation: rotateAnimation 70s infinite 1s normal;
+}
+
+.departments> :nth-child(7) {
+  animation: rotateAnimation 70s infinite 1.5s reverse;
+}
+
+.departments> :nth-child(8) {
+  animation: rotateAnimation 70s infinite 2s reverse;
+}
+
+.departments> :nth-child(9) {
+  animation: rotateAnimation 70s infinite 2.5s normal;
 }
