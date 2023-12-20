@@ -114,31 +114,28 @@ def getUserFeedback():
     # Record feedback on closed question
     recordAudio('closedQuestion')
 
-def getFeedbackStatus():
-    # Ask if the feedback positive or negative
-    playAudio('audio/open_question/open_question_p1.mp3')
-    playAudio('audio/departments/dep_' + str(data["departmentId"]) + '.mp3')
-    playAudio('audio/open_question/open_question_p2.mp3')
+
+def getPersonalFeedback():
+    # Ask for personal feedback
+    playAudio('audio/open_question.mp3')
+    
+    # Record feedback on open question
+    recordAudio('openQuestion')
 
     # Get sentiment
-    print("Enter 1 for positive feedback or 2 for negative feedback:")
+    playAudio('audio/sentiment/get_sentiment.mp3')
     data["sentiment"] = int(dailHandler())
     while data["sentiment"] not in [1, 2]:
         print("Invalid input. Please enter 1 for positive feedback or 2 for negative feedback.")
         data["sentiment"] = int(dailHandler())
 
-
-def getPersonalFeedback():
-    # Ask for personal feedback
-    playAudio('audio/sentiment/sentiment_' + str(data["sentiment"]) + '.mp3')
-    
-    # Record feedback on open question
-    recordAudio('openQuestion')
+    # Play feedback
+    playAudio('audio/sentiment/sentiment_state_' + str(data["sentiment"]) + '.mp3')
 
 
 def getFeedbackIntensity():
     global data_received
-    # Ask if the feedback positive or negative
+    # Ask intensity
     playAudio('audio/get_severity.mp3')
 
     # Get intensity
@@ -151,7 +148,7 @@ def getFeedbackIntensity():
 
     # TODO: Play audio "Bedankt voor je feedback, je kan nu inhaken"
     data_received = True
-    print('Je kan nu inhaken')
+    playAudio('audio/thank.mp3')
 
 def resetProgram():
     global data_received
@@ -294,7 +291,6 @@ def phoneFlow():
             greetUser()
             getDepartment()
             getUserFeedback()
-            getFeedbackStatus()
             getPersonalFeedback()
             getFeedbackIntensity()
             return
