@@ -8,7 +8,7 @@ const formatDate = (dateString) => {
 
 const Feedback = ({ feedback }) => {
     return (
-        <div>
+        <div className="card">
             <h3>Open question</h3>
             <audio controls>
                 <source src={feedback.audioUrls.open} type="audio/mp3" />
@@ -17,13 +17,12 @@ const Feedback = ({ feedback }) => {
             <audio controls>
                 <source src={feedback.audioUrls.closed} type="audio/mp3" />
             </audio>
-            <p><b>ID</b> {feedback.id}</p>
-            <p><b>Created At</b> {formatDate(feedback.createdAt)}</p>
-            <p><b>Intensity</b> {feedback.intensity}</p>
-            <p><b>Sentiment</b> {feedback.sentiment}</p>
-            <p><b>Department ID</b> {feedback.departmentId}</p>
-            <p><b>Location ID</b> {feedback.locationId}</p>
-            <p>______________________________________________________________</p>
+            <div className='info'>
+                <p className='info__item'><b>ID</b> {feedback.id}</p>
+                <p className='info__item'><b>Gemaakt op</b> {formatDate(feedback.createdAt)}</p>
+                <p className='info__item'><b>Intensiteit</b> {feedback.intensity}</p>
+                <p className='info__item'><b>Mening</b> {feedback.sentiment === 'POSITIVE' ? 'Positief' : 'Negatief'}</p>
+            </div>
         </div>
     );
 };

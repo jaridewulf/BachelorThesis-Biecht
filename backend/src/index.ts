@@ -23,17 +23,16 @@ app.get(`/departments`, async (req, res) => {
 
 // send back all feedbacks
 app.get(`/feedback`, async (req, res) => {
-  if (req.body?.departmentId) {
-    const feedbacks = await prisma.feedback.findMany({
-      where: {
-        departmentId: Number(req.body.departmentId)
-      }
-    })
-    res.json(feedbacks)
-  } else {
-    const feedbacks = await prisma.feedback.findMany()
-    res.json(feedbacks)
-  }
+  const feedbacks = await prisma.feedback.findMany()
+  res.json(feedbacks)
+});
+
+app.get(`/feedback/department/:departmentId`, async (req, res) => {
+  const { departmentId } = req.params
+  const feedbacks = await prisma.feedback.findMany({
+    where: { departmentId: Number(departmentId) },
+  })
+  res.json(feedbacks)
 });
 
 app.get(`/feedback/:id`, async (req, res) => {

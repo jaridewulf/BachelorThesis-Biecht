@@ -1,18 +1,21 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-import Feedback from './components/Feedback'
-import FeedbackList from './components/FeedbackList'
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import FeedbackList from './components/FeedbackList';
+import Nav from './components/Nav';
+import "./App.css";
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <FeedbackList />
-    </>
-  )
+    <div className='container'>
+      <Router>
+        <Nav />
+        <Routes>
+          <Route path="/department/:id" element={<FeedbackList />} />
+          <Route path="/" element={<FeedbackList />} />
+        </Routes>
+      </Router>
+    </div>
+  );
 }
 
-export default App
+export default App;
