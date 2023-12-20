@@ -25,8 +25,8 @@ const FeedbackList = () => {
     ];
 
     const fetchUrl = departmentId
-        ? `http://172.18.0.1:3000/feedback/department/${departmentId}`
-        : 'http://172.18.0.1:3000/feedback';
+        ? `https://api-debiecht.jaridewulf.be/feedback/department/${departmentId}`
+        : 'https://api-debiecht.jaridewulf.be/feedback';
 
     useEffect(() => {
         const fetchData = async () => {

@@ -7,7 +7,7 @@ const Nav = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        fetch('http://172.18.0.1:3000/departments')
+        fetch('https://api-debiecht.jaridewulf.be/departments')
             .then(response => response.json())
             .then(data => setDepartments(data))
             .catch(error => console.log(error));
